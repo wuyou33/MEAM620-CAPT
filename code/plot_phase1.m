@@ -45,7 +45,11 @@ dur = 1;
 t = linspace(t0,tf,n_frames);
 tic
 for ii = 1:n_frames
+    % Calculate new positions
     pos = (1-beta(t(ii)))*S + beta(t(ii))*G;
+    collided = false;
+    
+    % Update display and check collisions
     for jj = 1:N
         dists = sqrt(sum(bsxfun(@minus,pos([1:(jj-1),(jj+1):N],:),pos(jj,:)).^2,2));
         collide = dists < 2*r;
@@ -54,12 +58,18 @@ for ii = 1:n_frames
         if any(collide)
             colliders = find(collide);
             colliders(colliders >= jj) = colliders(colliders >= jj) + 1;
-            set(h_robots([colliders,jj]),'FaceColor',[1,0,0])
-            disp(['COLLISION AT t=',num2str(t)]);
-            return
+            set(h_robots([colliders,jj]),'FaceColor',[1,0.5,0.5],'EdgeColor',[1,0,0],'linewidth',6)
+            collided = true;
         end
     end
     drawnow
+    
+    % Return if collided
+    if collided
+        disp(['COLLISION AT t=',num2str(t(ii))]);
+        return
+    end
+    
     pause(dur/n_frames - toc);
     tic
 end
