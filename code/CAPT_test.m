@@ -2,28 +2,44 @@ clear all
 close all
 
 addpath('munkres')
-N = 5;
-M = 5;
+N = 50;
+M = 50;
 R = 0.5;
 
-dist_scale = 5;
-S = rand(N,2)*dist_scale;
-G_pre = rand(M,2)*dist_scale;
 max_v = 1;
 t_0 = 0;
+max_allow_dist = 2*R*sqrt(2);
 
-seed_flag = true;
-while seed_flag
-    D = zeros(N,M);
-    for i = 1:N
-        D(i,:) = sum(bsxfun(@minus,G_pre,S(i,:)).^2,2)';
+dist_scale = max_allow_dist*N;
+
+full_points = zeros(2*N,2);
+full_points(1,:) = rand(1,2)*dist_scale;
+
+for i = 2:2*N
+    seed_flag = true;
+    pull_vect = full_points(1:i-1,:);
+
+    while seed_flag
+        new_point = rand(1,2)*dist_scale;
+
+        dists = sqrt(sum(bsxfun(@minus,pull_vect,new_point).^2,2));
+        min_dist = min(dists);
+
+        if min_dist > max_allow_dist
+            full_points(i,:) = new_point;
+            seed_flag = false;
+        end
+        
     end
-    if min(D(:)) > 2*sqrt(2)*R
-        seed_flag = false;
-    else
-        S = rand(N,2)*dist_scale;
-        G_pre = rand(M,2)*dist_scale;
-    end
+
+end
+
+S = full_points(1:N,:);
+G_pre = full_points(N+1:end,:);
+
+D = zeros(N,M);
+for i = 1:N
+    D(i,:) = sum(bsxfun(@minus,G_pre,S(i,:)).^2,2)';
 end
 
 [assignment, cost] = munkres(D);
@@ -33,4 +49,3 @@ max_d = max(sqrt(D(lin_idx)));
 t_f = max_d/max_v;
 
 G = G_pre(assignment,:);
-
