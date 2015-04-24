@@ -7,7 +7,7 @@ M = 50;
 R = 0.5;
 
 max_v = 1;
-t_0 = 0;
+t0 = 0;
 max_allow_dist = 2*R*sqrt(2);
 
 dist_scale = max_allow_dist*N;
@@ -46,6 +46,8 @@ end
 lin_idx = sub2ind([N,M],1:N,assignment);
 max_d = max(sqrt(D(lin_idx)));
 
-t_f = max_d/max_v;
+tf = max_d/max_v;
 
 G = G_pre(assignment,:);
+
+plot_phase1(S,G,t0,tf,R)
