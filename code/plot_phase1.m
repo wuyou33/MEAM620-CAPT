@@ -3,6 +3,7 @@ function [] = plot_phase1(S,G,t0,tf,r)
 % ASSUMPTIONS:
 %   Velocity constant (for velocity verification)
 
+% Initialization ==========================================================
 N = size(S,1);
 
 % Time parameterization
@@ -16,9 +17,11 @@ robot_pts = r*[cos(theta'), sin(theta')];
 figure(1)
 clf
 
+% Draw trajectories
 plot(reshape([S(:,1)';G(:,1)';NaN(1,N)],[3*N,1]), ...
     reshape([S(:,2)';G(:,2)';NaN(1,N)],[3*N,1]),'+-k');
 
+% Draw robots
 hold on
 h_robots = zeros(N,1);
 for ii = 1:N
@@ -27,6 +30,7 @@ for ii = 1:N
 end
 hold off
 
+% Set axes properties
 axis equal
 xbound = [min([S(:,1); G(:,1)])-r, max([S(:,1); G(:,1)+r])];
 ybound = [min([S(:,2); G(:,2)])-r, max([S(:,2); G(:,2)+r])];
@@ -39,7 +43,7 @@ waitforbuttonpress
 max_v = max(sqrt(sum((G-S).^2,2))/(tf-t0));
 disp(['Max velocity: ',num2str(max_v)]);
 
-% Animate the motion
+% Animate the motion ======================================================
 n_frames = 30;
 dur = 1;
 t = linspace(t0,tf,n_frames);
@@ -70,6 +74,7 @@ for ii = 1:n_frames
         return
     end
     
+    % Animation timing
     pause(dur/n_frames - toc);
     tic
 end

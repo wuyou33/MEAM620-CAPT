@@ -5,8 +5,8 @@ addpath('munkres')
 
 dim = 3;
 
-N = 5;
-M = 5;
+N = 25;
+M = 25;
 r_base = .5;
 
 R = [r_base; r_base; 4*r_base];
@@ -77,7 +77,7 @@ toc
 
 fprintf('Plotting... ')
 f = figure();
-plot_phase1(S,G,t0,tf,R)
+plot_3D(S,G,t0,tf,R)
 % hold on
 % grid on
 % plot3(S(:,1),S(:,2),S(:,3),'b.')
