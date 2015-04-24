@@ -2,8 +2,8 @@ clear all
 close all
 
 addpath('munkres')
-N = 1000;
-M = 1000;
+N = 700;
+M = 700;
 R = 0.5;
 
 max_v = 1;
