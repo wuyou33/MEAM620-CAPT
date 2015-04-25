@@ -5,11 +5,11 @@ addpath('munkres')
 
 dim = 3;
 
-N = 25;
-M = 25;
+N = 3;
+M = 3;
 r_base = .5;
 
-R = [r_base; r_base; 4*r_base];
+R = [r_base; r_base; r_base];
 
 max_v = 1;
 max_a = 1;
@@ -34,7 +34,7 @@ for i = 2:2*N
         min_dist = min(dists);
 
         if min_dist > max_allow_dist
-            new_point = new_point .*[1,1,4];
+            new_point = new_point .*[1,1,1];
             full_points(i,:) = new_point;
             seed_flag = false;
         end
