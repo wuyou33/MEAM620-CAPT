@@ -5,8 +5,8 @@ addpath('munkres')
 
 dim = 3;
 
-N = 30;
-M = 30;
+N = 10;
+M = 4;
 r_base = .5;
 
 R = [r_base; r_base; r_base];
@@ -17,13 +17,13 @@ max_a = 1;
 t0 = 0;
 max_allow_dist = 2*r_base*sqrt(2);
 
-dist_scale = [max_allow_dist*N, max_allow_dist*N, .25*max_allow_dist*N];
+dist_scale = [max_allow_dist*(N+M), max_allow_dist*(N+M), .25*max_allow_dist*(N+M)];
 
-full_points = zeros(2*N,dim);
+full_points = zeros(N+M,dim);
 full_points(1,:) = rand(1,dim).*dist_scale;
 
 fprintf('Generating start and goal locations... ')
-for i = 2:2*N
+for i = 2:M+N
     seed_flag = true;
     pull_vect = full_points(1:i-1,:);
 
@@ -60,7 +60,12 @@ fprintf('Running the Hungarian algorithm... ')
 [assignment, cost] = munkres(D);
 fprintf('Done! \n')
 
+assignment_save = assignment;
+dm = ~assignment;
+assignment(dm) = 1;
+
 G = G_pre(assignment,:);
+G(dm,:) = S(dm,:);
 
 lin_idx = sub2ind([N,M],1:N,assignment);
 max_d = max(sqrt(D(lin_idx)));
@@ -82,14 +87,6 @@ tf = sqrt(max_d_a*5.773)/max_a + .1*(max_d_a)^(1/3);
 toc
 
 fprintf('Plotting... ')
-%f = figure();
 plot_3D(S,G,t0,tf,R)
-% hold on
-% grid on
-% plot3(S(:,1),S(:,2),S(:,3),'b.')
-% plot3(G(:,1),G(:,2),G(:,3),'r.')
-% axis equal
-% pause
-% delete(f)
 fprintf('Done! \n')
 
