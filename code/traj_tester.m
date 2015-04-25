@@ -3,15 +3,14 @@ close all
 
 X = [-1 0 0;...
     0 2 0;...
-    1 1 0;...
     1 0 0];
-X_0 = [0 0 0;...
+X_0 = [-1 -5 0;...
         0 0 0;...
         0 0 0];
 X_f = [0 0 0;...
         0 0 0;...
         0 0 0];
-ts = [0 5 7 8]';
+ts = [0 5 6]';
 n = 4;
 [c,A,B] = min_n_traj(X,X_0,X_f,n,ts);
 
@@ -31,13 +30,17 @@ t_mat_7 = @(t)([1 t t^2 t^3 t^4 t^5 t^6 t^7;...
     0 1 2*t 3*t^2 4*t^3 5*t^4 6*t^5 7*t^6;...
     0 0 2 6*t 12*t^2 20*t^3 30*t^4 42*t^5]);
     %}
+
 for i = 1:length(time)
     t = time(i);
+    %{
     if t > ts(c_idx+1)
         c_idx = c_idx+1;
         coeff = c((c_idx-1)*2*n+1:c_idx*2*n,:);
     end
-    traj = t_mat_7(t)*coeff;
+    %}
+    coeff = follower(c,n,ts,t);
+    traj = time_matrix(t,n)*coeff;
     pos(i,:) = traj(1,:);
     vel(i,:) = traj(2,:);
     acc(i,:) = traj(3,:);
