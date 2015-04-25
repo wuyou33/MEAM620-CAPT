@@ -2,8 +2,7 @@ clear all
 close all
 
 set_points = [10, 15, 20, 30, 50, 70, 100, 150, 200, 300, 500, 700, 1000];
-
-runs_per = 25;
+runs_per = 50;
 
 times = zeros(runs_per,numel(set_points));
 
@@ -17,5 +16,10 @@ end
 
 x_test = linspace(0,max(set_points),1000);
 
-boxplot(log(times))
-set(gca,'yticklabel',num2str(exp(get(gca,'ytick')'),'%10.3e'))
+save('boxplot_data.mat','times');
+% 
+% boxplot(log(times))
+% set(gca,'yticklabel',num2str(exp(get(gca,'ytick')'),'%10.3e'))
+% xlabel('Number of Robots','FontSize',15)
+% ylabel('Run Time','FontSize',15)
+% title(strcat(['C-CAPT Run Time, N = ',num2str(runs_per)]),'FontSize',15)
