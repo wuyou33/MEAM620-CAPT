@@ -5,11 +5,11 @@ addpath('munkres')
 
 dim = 3;
 
-N = 10;
-M = 4;
+N = 4;
+M = 10;
 r_base = .5;
 
-R = [r_base; r_base; r_base];
+R = [r_base, r_base, r_base];
 
 max_v = 1;
 max_a = 1;
@@ -46,47 +46,66 @@ end
 fprintf('Done! \n')
 
 S = full_points(1:N,:);
+S_save = S;
 G_pre = full_points(N+1:end,:);
 
 tic
-fprintf('Calculating distances... ')
-D = zeros(N,M);
-for i = 1:N
-    D(i,:) = sum(bsxfun(@minus,G_pre,S(i,:)).^2,2)';
+
+iters = ceil(M/N);
+
+S_pass = repmat(S,1,1,iters);
+G_pass = zeros(N,3,iters);
+tf = zeros(1,iters);
+
+W_pass = repmat(S,1,1,iters+1);
+
+for i = 1:iters
+
+    fprintf('Calculating distances... ')
+    D = zeros(N,M);
+    for j = 1:N
+        D(j,:) = sum(bsxfun(@minus,G_pre,S(j,:)).^2,2)';
+    end
+    fprintf('Done! \n')
+    
+    fprintf('Running the Hungarian algorithm %d of %d... ',i,iters)
+    [assignment, cost] = munkres(D);
+    fprintf('Done! \n')
+
+    assignment_save = assignment;
+    dm = ~assignment;
+    assignment(dm) = 1;
+
+    G = G_pre(assignment,:);
+    G(dm,:) = S(dm,:);
+    
+    lin_idx = sub2ind([N,M],1:N,assignment);
+    max_d = max(sqrt(D(lin_idx)));
+
+    [~,ind] = min(abs(D(:) - max_d^2));
+    [ind_i, ind_j] = ind2sub([N,M],ind);
+    raw_dist = (G_pre(ind_j,:)-S(ind_i,:));
+    raw_dist = raw_dist.* [1,1,2.2];
+    max_d_a = sqrt(sum((raw_dist.^2)));
+
+    rescale = [1,1,4];
+
+    G_pass(:,:,i) = bsxfun(@times,G,rescale);
+    S_pass(:,:,i) = bsxfun(@times,S,rescale);
+    S = G;
+    R = R.*rescale;
+    G_pre(assignment,:) = [];
+
+    tf(i) = sqrt(max_d_a*5.773)/max_a + .1*(max_d_a)^(1/3);
+    
+    M = M-N;
+    
 end
-fprintf('Done! \n')
-
-fprintf('Running the Hungarian algorithm... ')
-[assignment, cost] = munkres(D);
-fprintf('Done! \n')
-
-assignment_save = assignment;
-dm = ~assignment;
-assignment(dm) = 1;
-
-G = G_pre(assignment,:);
-G(dm,:) = S(dm,:);
-
-lin_idx = sub2ind([N,M],1:N,assignment);
-max_d = max(sqrt(D(lin_idx)));
-
-[~,ind] = min(abs(D(:) - max_d^2));
-[ind_i, ind_j] = ind2sub([N,M],ind);
-raw_dist = (G_pre(ind_j,:)-S(ind_i,:));
-raw_dist = raw_dist.* [1,1,2.2];
-max_d_a = sqrt(sum((raw_dist.^2)));
-
-rescale = [1,1,4];
-
-G = bsxfun(@times,G,rescale);
-S = bsxfun(@times,S,rescale);
-R = R'.*rescale;
-
-tf = sqrt(max_d_a*5.773)/max_a + .1*(max_d_a)^(1/3);
-
 toc
 
-fprintf('Plotting... ')
-plot_3D(S,G,t0,tf,R)
-fprintf('Done! \n')
+W_pass(:,:,2:iters+1) = G_pass;
+
+% fprintf('Plotting... ')
+% plot_3D_multi_wp(S,G,tf,R)
+% fprintf('Done! \n')
 
