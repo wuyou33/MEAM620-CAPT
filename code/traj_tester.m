@@ -1,8 +1,9 @@
-clear all
+%clear all
 close all
 
 X = [-1 0 0;...
-    -1 1 0;...
+    0 2 0;...
+    1 1 0;...
     1 0 0];
 X_0 = [0 0 0;...
         0 0 0;...
@@ -10,9 +11,9 @@ X_0 = [0 0 0;...
 X_f = [0 0 0;...
         0 0 0;...
         0 0 0];
-ts = [0  6 8]';
+ts = [0 5 7 8]';
 n = 4;
-[B,~] = min_n_traj(X,X_0,X_f,n,ts);
+[c,A,B] = min_n_traj(X,X_0,X_f,n,ts);
 
 time = (0:0.001:ts(end))';
 pos = zeros(length(time),3);
@@ -20,7 +21,7 @@ vel = zeros(length(time),3);
 acc = zeros(length(time),3);
 jerk = zeros(length(time),3);
 c_idx = 1;
-coeff = B(1:2*n,:);
+coeff = c(1:2*n,:);
 
 t_mat_3 = @(p)([1 p p^2 p^3;...
     0 1 2*p 3*p^2;...
@@ -34,7 +35,7 @@ for i = 1:length(time)
     t = time(i);
     if t > ts(c_idx+1)
         c_idx = c_idx+1;
-        coeff = B((c_idx-1)*2*n+1:c_idx*2*n,:);
+        coeff = c((c_idx-1)*2*n+1:c_idx*2*n,:);
     end
     traj = t_mat_7(t)*coeff;
     pos(i,:) = traj(1,:);
