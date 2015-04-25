@@ -5,8 +5,8 @@ addpath('munkres')
 
 dim = 3;
 
-N = 100;
-M = 1;
+N = 1;
+M = 5;
 r_base = .5;
 
 R = [r_base, r_base, r_base];
