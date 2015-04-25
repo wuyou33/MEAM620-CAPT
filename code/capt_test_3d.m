@@ -1,5 +1,5 @@
 clear all
-close all
+%close all
 
 addpath('munkres')
 
@@ -76,7 +76,7 @@ tf = sqrt(max_d_a*5.773)/max_a + .1*(max_d_a)^(1/3);
 toc
 
 fprintf('Plotting... ')
-f = figure();
+%f = figure();
 plot_3D(S,G,t0,tf,R)
 % hold on
 % grid on
