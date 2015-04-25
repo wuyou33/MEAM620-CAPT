@@ -5,8 +5,8 @@ addpath('munkres')
 
 dim = 3;
 
-N = 4;
-M = 10;
+N = 100;
+M = 1;
 r_base = .5;
 
 R = [r_base, r_base, r_base];
@@ -57,8 +57,6 @@ S_pass = repmat(S,1,1,iters);
 G_pass = zeros(N,3,iters);
 tf = zeros(1,iters);
 
-W_pass = repmat(S,1,1,iters+1);
-
 for i = 1:iters
 
     fprintf('Calculating distances... ')
@@ -93,7 +91,6 @@ for i = 1:iters
     G_pass(:,:,i) = bsxfun(@times,G,rescale);
     S_pass(:,:,i) = bsxfun(@times,S,rescale);
     S = G;
-    R = R.*rescale;
     G_pre(assignment,:) = [];
 
     tf(i) = sqrt(max_d_a*5.773)/max_a + .1*(max_d_a)^(1/3);
@@ -103,9 +100,12 @@ for i = 1:iters
 end
 toc
 
+R = R.*rescale;
+
+W_pass(:,:,1) = S_pass(:,:,1);
 W_pass(:,:,2:iters+1) = G_pass;
 
-% fprintf('Plotting... ')
-% plot_3D_multi_wp(S,G,tf,R)
-% fprintf('Done! \n')
+fprintf('Plotting... ')
+plot_3D_multi_wp(W_pass,tf,R)
+fprintf('Done! \n')
 
