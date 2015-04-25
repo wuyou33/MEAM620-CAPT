@@ -3,13 +3,6 @@ function [] = plot_3D(S,G,t0,tf,r)
 % ASSUMPTIONS:
 %   Velocity constant (for velocity verification)
 
-% HACKS
-%{
-S(:,3) = S(:,3)*4;
-G(:,3) = G(:,3)*4;
-r(3) = r(3)*4;
-%}
-
 % Initialization ==========================================================
 N = size(S,1);
 
@@ -98,6 +91,7 @@ end
 
 end
 
+%{
 function coeff = quintic_generate(pts, ts)
 % Generate quintic spline trajectories with the option at each node to halt
 % completely or fly through with continuous 4th derivative.
@@ -131,3 +125,4 @@ t_vect = [1 0 0;
           t_n.^5 5*t_n.^4 20*t_n.^3];
  ss = sum(bsxfun(@times,coeff(1:6),t_vect));
 end
+%}
