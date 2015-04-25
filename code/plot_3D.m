@@ -14,8 +14,11 @@ r(3) = r(3)*4;
 N = size(S,1);
 
 % Time parameterization
-coeff = quintic_generate([0,1],[t0,tf]);
-beta = @(t) quintic_follow(coeff, t);
+%coeff = quintic_generate([0,1],[t0,tf]);
+%beta = @(t) quintic_follow(coeff, t);
+n = 4;
+coeff = min_n_traj([0 1]',[zeros(1,n-1)]',[zeros(1,n-1)]',n,[t0 tf]');
+beta = @(t) follower(coeff,n,[t0 tf]',t);
 
 % Robot patch points
 [rx, ry, rz] = ellipsoid(0,0,0,r(1),r(2),r(3),20);
