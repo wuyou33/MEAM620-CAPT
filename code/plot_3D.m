@@ -43,7 +43,7 @@ zbound = [min([S(:,3); G(:,3)])-r(3), max([S(:,3); G(:,3)])+r(3)];
 set(gca,'xlim',xbound,'ylim',ybound,'zlim',zbound)
 title('C-CAPT Phase 1: 3D')
 
-waitforbuttonpress
+%waitforbuttonpress
 
 % Animate the motion ======================================================
 n_frames = 30;
@@ -82,7 +82,7 @@ for ii = 1:n_frames
     end
     
     % Animation timing
-    pause(dur/n_frames - toc);
+   % pause(dur/n_frames - toc);
     tic
 end
 
