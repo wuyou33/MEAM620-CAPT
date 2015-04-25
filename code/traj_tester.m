@@ -24,8 +24,7 @@ coeff = C(1:2*n,:);
 
 for i = 1:length(time)
     t = time(i);
-    coeff = follower(C,n,ts,t);
-    traj = time_matrix(t,n)*coeff;
+    traj = follower(C,n,ts,t);
     pos(i,:) = traj(1,:);
     vel(i,:) = traj(2,:);
     acc(i,:) = traj(3,:);
