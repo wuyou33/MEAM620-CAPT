@@ -5,8 +5,8 @@ addpath('munkres')
 
 dim = 3;
 
-N = 3;
-M = 3;
+N = 30;
+M = 30;
 r_base = .5;
 
 R = [r_base; r_base; r_base];
@@ -17,10 +17,10 @@ max_a = 1;
 t0 = 0;
 max_allow_dist = 2*r_base*sqrt(2);
 
-dist_scale = max_allow_dist*N;
+dist_scale = [max_allow_dist*N, max_allow_dist*N, .25*max_allow_dist*N];
 
 full_points = zeros(2*N,dim);
-full_points(1,:) = rand(1,dim)*dist_scale;
+full_points(1,:) = rand(1,dim).*dist_scale;
 
 fprintf('Generating start and goal locations... ')
 for i = 2:2*N
@@ -28,7 +28,7 @@ for i = 2:2*N
     pull_vect = full_points(1:i-1,:);
 
     while seed_flag
-        new_point = rand(1,dim)*dist_scale;
+        new_point = rand(1,dim).*dist_scale;
 
         dists = sqrt(sum(bsxfun(@minus,pull_vect,new_point).^2,2));
         min_dist = min(dists);
@@ -70,6 +70,12 @@ max_d = max(sqrt(D(lin_idx)));
 raw_dist = (G_pre(ind_j,:)-S(ind_i,:));
 raw_dist = raw_dist.* [1,1,2.2];
 max_d_a = sqrt(sum((raw_dist.^2)));
+
+rescale = [1,1,4];
+
+G = bsxfun(@times,G,rescale);
+S = bsxfun(@times,S,rescale);
+R = R'.*rescale;
 
 tf = sqrt(max_d_a*5.773)/max_a + .1*(max_d_a)^(1/3);
 
