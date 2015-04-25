@@ -1,4 +1,4 @@
-function [coeff,A,B] = min_n_traj(X,X_0, X_f,n,t)
+function coeff = min_n_traj(X,X_0, X_f,n,t)
 [N,M] = size(X);
 
 if size(X_0,1) ~= n-1 || size(X_f,1) ~= n-1 || size(X,1) ~= length(t)
