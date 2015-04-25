@@ -3,6 +3,13 @@ function [] = plot_3D(S,G,t0,tf,r)
 % ASSUMPTIONS:
 %   Velocity constant (for velocity verification)
 
+% HACKS
+%{
+S(:,3) = S(:,3)*4;
+G(:,3) = G(:,3)*4;
+r(3) = r(3)*4;
+%}
+
 % Initialization ==========================================================
 N = size(S,1);
 
