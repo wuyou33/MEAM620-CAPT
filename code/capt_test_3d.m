@@ -11,8 +11,7 @@ r_base = .15;
 
 R = [r_base, r_base, r_base];
 
-max_v = 1;
-max_a = 1;
+max_a = 5;
 
 t0 = 0;
 max_allow_dist = 2*r_base*sqrt(2);

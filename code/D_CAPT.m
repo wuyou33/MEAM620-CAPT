@@ -84,13 +84,13 @@ g_plots = zeros(N,1);
 
 hold on
 for i = 1:N
-    h_plots(i) = patch(r_c_x + robots{i}.pos(1), r_c_y + robots{i}.pos(2), ...
+    h_plots(i) = patch(h_c_x + robots{i}.pos(1), h_c_y + robots{i}.pos(2), ...
         'b', 'facealpha', 0.2, 'edgealpha', 0);
     p_plots(i) = plot(0,0,'-','color',[1,0.5,0],'linewidth',2);
     g_plots(i) = plot(0,0,'--','color',[1,0.5,0],'linewidth',2);
 end
 for i = 1:N
-    r_plots(i) = patch(h_c_x + robots{i}.pos(1), h_c_y + robots{i}.pos(2), ...
+    r_plots(i) = patch(r_c_x + robots{i}.pos(1), r_c_y + robots{i}.pos(2), ...
         'b','facecolor', [1,0.5,0], 'facealpha', 0.5, 'edgealpha', 1);
 end
 
@@ -111,6 +111,18 @@ for i_t = 1:length(t)
     for i = 1:N
         robots{i}.pos = update_pos(robots{i},t_c,t_f);
         X(i,:) = robots{i}.pos;
+        
+        for j = (i+1):N
+            dist = sqrt(sum((robots{i}.pos - robots{j}.pos).^2));
+            if dist < r_base
+                disp('COLLISION')
+                set(r_plots(i), 'cdata', [1,0,0], 'facealpha', 1, ...
+                    'linewidth', 3, 'edgecolor', 'r');
+                set(r_plots(j), 'cdata', [1,0,0], 'facealpha', 1, ...
+                    'linewidth', 3, 'edgecolor', 'r');
+                return
+            end
+        end
     end
     
     % update plotting for all robots
