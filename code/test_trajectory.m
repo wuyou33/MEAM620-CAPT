@@ -36,6 +36,7 @@ end
 fprintf('Initializing figures...\n')
 if vis
     h_fig = figure('Name', 'Environment');
+    %plot3(0,0,0,'w')
     %set(gca,'xlim',[-.5,1.5],'ylim',[-.5,1.5],'zlim',[-.5,1.5]);
     axis equal
 else

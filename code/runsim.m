@@ -1,18 +1,8 @@
 addpath(genpath('./'));
 
-try
-close 2 3 4 5
-catch
-end
+close all
 
 %% Additional init script
-%{
-W = cat(3,[0,0,0; 1,0,0], ...
-          [0,1,0; 1,1,0], ...
-          [0,1,1; 1,1,1]);
-t = [1, 1];
-%}
-
 start = num2cell(W(:,:,1),2);
 stop = num2cell(W(:,:,end),2);
 
