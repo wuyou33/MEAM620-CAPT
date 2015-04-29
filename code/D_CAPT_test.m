@@ -1,9 +1,9 @@
-clear all
+%clear all
 %close all
 
 dim = 2;
 
-N = 8;
+N = 20;
 M = N;
 r_base = .5;
 
@@ -67,7 +67,7 @@ for i_t = 1:N
 
 end
 
-C_prev = C;
+C_prev = zeros(N);
 t_prev = t(1);
 
 thetas = linspace(0,2*pi,20)';
@@ -129,12 +129,11 @@ for i_t = 1:length(t)
     % D-CAPT for each robot
     for i = 1:N
         robots{i}.U = (C(i,:) - C_prev(i,:)) > 0;
-        robots{i}.U = robots{i}.U & C(i,:);
+        %robots{i}.U = robots{i}.U & C(i,:);
         
-        for j = 1:numel(robots{i}.U)
-            if ~robots{i}.U(j)
-                continue
-            end
+        while sum(robots{i}.U)
+            
+            j = find(robots{i}.U,1,'first');
             
             u = robots{j}.pos - robots{i}.pos;
             w = robots{j}.goal - robots{i}.goal;
@@ -151,7 +150,13 @@ for i_t = 1:length(t)
                 robots{j}.t_0 = t_c;
                 robots{j}.start = robots{j}.pos;
                 
+                robots{i}.U = C(i,:);
+                robots{j}.U = C(j,:);
+                
             end
+            
+            robots{i}.U(j) = false;
+            robots{j}.U(i) = false;
             
         end
         
