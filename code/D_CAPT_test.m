@@ -64,20 +64,51 @@ for i_t = 1:N
     robots{i_t}.pos = S(i_t,:);
     robots{i_t}.start = S(i_t,:);
     robots{i_t}.t_0 = t_0;
+
 end
 
 C_prev = C;
 t_prev = t(1);
 
+thetas = linspace(0,2*pi,20)';
+r_c_x = [r_base * cos(thetas);h * cos(thetas)];
+r_c_y = [r_base * sin(thetas);h * sin(thetas)];
+r_c = [r_c_x,r_c_y];
+% h_c_x = h * cos(thetas);
+% h_c_y = h * sin(thetas);
+
+pad = min(h,5);
+
+x_min = min(full_points(:,1))-pad;
+x_max = max(full_points(:,1))+pad;
+
+y_min = min(full_points(:,2))-pad;
+y_max = max(full_points(:,2))+pad;
+
 figure(1)
 clf
-r_plots = plot(X(:,1),X(:,2),'ro');
-hold on
+r_plots = zeros(numel(robots),1); %plot(X(:,1),X(:,2),'ro');
 plot(G(:,1),G(:,2),'k*')
+
+hold on
+
+for i = 1:N
+    r_pos = bsxfun(@plus, r_c,robots{i}.pos);
+    r_plots(i) = patch('Vertices',r_pos,...
+                       'Faces',[1:20;21:40],...
+                       'FaceColor','flat',...
+                       'FaceVertexAlphaData',[.5;.1],...
+                       'FaceAlpha','flat',...
+                       'AlphaDataMapping','none',...
+                       'FaceVertexCData',[1,0,0;0,0,1]);
+end
+
 axis equal
 grid on
+xlim([x_min,x_max])
+ylim([y_min,y_max])
 
-for i_t = 2:length(t)
+for i_t = 1:length(t)
     % get new time stamp
     t_c = t(i_t);
     
@@ -86,7 +117,11 @@ for i_t = 2:length(t)
         robots{i}.pos = update_pos(robots{i},t_c,t_f);
         X(i,:) = robots{i}.pos;
     end
-    set(r_plots,'xdata',X(:,1),'ydata',X(:,2))
+    
+    for i = 1:N
+        r_pos = bsxfun(@plus, r_c,robots{i}.pos);
+        set(r_plots(i),'Vertices',r_pos);
+    end
     
     % calculate the new C matrix
     C = calculate_C(X,h);
