@@ -1,6 +1,6 @@
 dim = 2;    % dimensions of environment
 
-N = 10;     % Number of robots
+N = 15;     % Number of robots
 M = N;      % Number of goals
 r_base = .5;% Robot radius
 
@@ -12,30 +12,35 @@ full_points = zeros(N+M,dim);
 full_points(1,:) = rand(1,dim);
 
 fprintf('Generating start and goal locations... ')
-for i_t = 2:M+N
-    seed_flag = true;
-    pull_vect = full_points(1:i_t-1,:);
+billiards = true;
+if ~billiards
+    for i_t = 2:M+N
+        seed_flag = true;
+        pull_vect = full_points(1:i_t-1,:);
 
-    while seed_flag
-        new_point = rand(1,dim).*dist_scale;
+        while seed_flag
+            new_point = rand(1,dim).*dist_scale;
 
-        dists = sqrt(sum(bsxfun(@minus,pull_vect,new_point).^2,2));
-        min_dist = min(dists);
+            dists = sqrt(sum(bsxfun(@minus,pull_vect,new_point).^2,2));
+            min_dist = min(dists);
 
-        if min_dist > max_allow_dist
-            full_points(i_t,:) = new_point;
-            seed_flag = false;
+            if min_dist > max_allow_dist
+                full_points(i_t,:) = new_point;
+                seed_flag = false;
+            end
+
         end
-        
+        full_points(i_t,:) = new_point;
+
     end
-    full_points(i_t,:) = new_point;
+    fprintf('Done! \n')
 
+    S = full_points(1:N,:);
+    G = full_points(N+1:end,:);
+else
+    [S,G] = generate_billiards(r_base,N,dim);
+    full_points = [S;G];
 end
-fprintf('Done! \n')
-
-S = full_points(1:N,:);
-S_save = S;
-G = full_points(N+1:end,:);
 
 %% start D-CAPT
 robots = cell(N,1);
