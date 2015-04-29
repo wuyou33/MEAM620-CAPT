@@ -89,6 +89,7 @@ r_plots = zeros(N,1);
 h_plots = zeros(N,1);
 p_plots = zeros(N,1);
 g_plots = zeros(N,1);
+t_plots = zeros(N,1);
 
 % Plotting
 hold on
@@ -101,6 +102,7 @@ end
 for i = 1:N
     r_plots(i) = patch(r_c_x + robots{i}.pos(1), r_c_y + robots{i}.pos(2), ...
         'b','facecolor', [1,0.5,0], 'facealpha', 0.5, 'edgealpha', 1);
+    t_plots(i) = text(robots{i}.pos(1), robots{i}.pos(2), num2str(i));
 end
 
 plot(G(:,1),G(:,2),'k+','markersize',8)
@@ -117,19 +119,21 @@ for i_t = 1:length(t)
     t_c = t(i_t);
     
     % update the motion for all robots
+    cc_dist = zeros(N);
     for i = 1:N
         robots{i}.pos = update_pos(robots{i},t_c,t_f);
         X(i,:) = robots{i}.pos;
         paths{i}(i_t,:) = robots{i}.pos;
-        
+            
         % Collision checking
         for j = (i+1):N
-            dist = sqrt(sum((robots{i}.pos - robots{j}.pos).^2));
-            if dist < r_base
+            cc_dist(i,j) = sqrt(sum((robots{i}.pos - robots{j}.pos).^2));
+            %fprintf([num2str(dist),'\n']);
+            if cc_dist(i,j) < 2*r_base
                 disp('COLLISION')
-                set(r_plots(i), 'cdata', [1,0,0], 'facealpha', 1, ...
+                set(r_plots(i), 'facecolor', [1,0,0], 'facealpha', 1, ...
                     'linewidth', 3, 'edgecolor', 'r');
-                set(r_plots(j), 'cdata', [1,0,0], 'facealpha', 1, ...
+                set(r_plots(j), 'facecolor', [1,0,0], 'facealpha', 1, ...
                     'linewidth', 3, 'edgecolor', 'r');
                 return
             end
@@ -138,12 +142,12 @@ for i_t = 1:length(t)
     
     % update plotting for all robots
     for i = 1:N
-        set(r_plots(i), 'xdata', r_c_x + robots{i}.pos(1), 'ydata', r_c_y + robots{i}.pos(2));
         set(h_plots(i), 'xdata', h_c_x + robots{i}.pos(1), 'ydata', h_c_y + robots{i}.pos(2));
-        
         set(p_plots(i), 'xdata', paths{i}(1:i_t,1), 'ydata', paths{i}(1:i_t,2));
         set(g_plots(i), 'xdata', [robots{i}.pos(1), robots{i}.goal(1)], ...
             'ydata', [robots{i}.pos(2), robots{i}.goal(2)])
+        set(r_plots(i), 'xdata', r_c_x + robots{i}.pos(1), 'ydata', r_c_y + robots{i}.pos(2));
+        set(t_plots(i), 'position', robots{i}.pos);
     end
     
     % calculate the new C matrix

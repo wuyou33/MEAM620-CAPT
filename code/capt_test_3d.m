@@ -106,14 +106,12 @@ W_pass(:,:,2:iters+1) = G_pass;
 
 fprintf('Plotting... ')
 %plot_3D_multi_wp(W_pass,tf,R)
+
 W = W_pass;
 t = tf;
 init_script;
+
+
 trajectory = test_trajectory(num2cell(W(:,:,1),2), num2cell(W(:,:,end),2), true); % without visualization
-%{
-W = W_pass;
-t = tf;
-runsim
-%}
 fprintf('Done! \n')
 
