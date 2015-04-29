@@ -11,7 +11,7 @@ r_base = .15;
 
 R = [r_base, r_base, r_base];
 
-max_a = 5;
+max_a = 2;
 
 t0 = 0;
 max_allow_dist = 2*r_base*sqrt(2);
@@ -108,6 +108,12 @@ fprintf('Plotting... ')
 %plot_3D_multi_wp(W_pass,tf,R)
 W = W_pass;
 t = tf;
+init_script;
+trajectory = test_trajectory(num2cell(W(:,:,1),2), num2cell(W(:,:,end),2), true); % without visualization
+%{
+W = W_pass;
+t = tf;
 runsim
+%}
 fprintf('Done! \n')
 

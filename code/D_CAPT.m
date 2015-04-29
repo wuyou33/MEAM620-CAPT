@@ -59,14 +59,16 @@ for i_t = 1:N
 end
 
 C_prev = zeros(N);
-t_prev = t(1);
 
+%% Plotting Initialization
+% Patch object points
 thetas = linspace(0,2*pi,20)';
 r_c_x = r_base * cos(thetas);
 r_c_y = r_base * sin(thetas);
 h_c_x = h * cos(thetas);
 h_c_y = h * sin(thetas);
 
+% Axes boundaries
 pad = min(h,5);
 
 x_min = min(full_points(:,1))-pad;
@@ -75,6 +77,7 @@ x_max = max(full_points(:,1))+pad;
 y_min = min(full_points(:,2))-pad;
 y_max = max(full_points(:,2))+pad;
 
+% Handles
 figure(1)
 clf
 r_plots = zeros(N,1);
@@ -82,12 +85,13 @@ h_plots = zeros(N,1);
 p_plots = zeros(N,1);
 g_plots = zeros(N,1);
 
+% Plotting
 hold on
 for i = 1:N
     h_plots(i) = patch(h_c_x + robots{i}.pos(1), h_c_y + robots{i}.pos(2), ...
         'b', 'facealpha', 0.2, 'edgealpha', 0);
     p_plots(i) = plot(0,0,'-','color',[1,0.5,0],'linewidth',2);
-    g_plots(i) = plot(0,0,'--','color',[1,0.5,0],'linewidth',2);
+    g_plots(i) = plot(0,0,'--','color',[1,0.5,0],'linewidth',1);
 end
 for i = 1:N
     r_plots(i) = patch(r_c_x + robots{i}.pos(1), r_c_y + robots{i}.pos(2), ...
@@ -111,7 +115,9 @@ for i_t = 1:length(t)
     for i = 1:N
         robots{i}.pos = update_pos(robots{i},t_c,t_f);
         X(i,:) = robots{i}.pos;
+        paths{i}(i_t,:) = robots{i}.pos;
         
+        % Collision checking
         for j = (i+1):N
             dist = sqrt(sum((robots{i}.pos - robots{j}.pos).^2));
             if dist < r_base
@@ -130,7 +136,6 @@ for i_t = 1:length(t)
         set(r_plots(i), 'xdata', r_c_x + robots{i}.pos(1), 'ydata', r_c_y + robots{i}.pos(2));
         set(h_plots(i), 'xdata', h_c_x + robots{i}.pos(1), 'ydata', h_c_y + robots{i}.pos(2));
         
-        paths{i}(i_t,:) = robots{i}.pos;
         set(p_plots(i), 'xdata', paths{i}(1:i_t,1), 'ydata', paths{i}(1:i_t,2));
         set(g_plots(i), 'xdata', [robots{i}.pos(1), robots{i}.goal(1)], ...
             'ydata', [robots{i}.pos(2), robots{i}.goal(2)])
