@@ -3,7 +3,7 @@ clear all
 
 dim = 2;
 
-N = 5;
+N = 8;
 M = N;
 r_base = .5;
 
@@ -54,7 +54,7 @@ t_f = 1;
 dt = .001;
 t = linspace(t_0,t_f,(t_f-t_0)/dt);
 
-h = 6*sqrt(2)*r_base;
+h = 4*sqrt(2)*r_base;
 
 X = S;
 C = calculate_C(X,h);
@@ -86,19 +86,46 @@ for i_t = 2:length(t)
         robots{i}.pos = update_pos(robots{i},t_c,t_f);
         X(i,:) = robots{i}.pos;
     end
-    %set(r_plots,'xdata',X(:,1),'ydata',X(:,2))
+    set(r_plots,'xdata',X(:,1),'ydata',X(:,2))
     
     % calculate the new C matrix
     C = calculate_C(X,h);
     
     % D-CAPT for each robot
     for i = 1:N
-        U_i = (C(i,:) - C_prev(i,:)) > 0;
+        robots{i}.U = (C(i,:) - C_prev(i,:)) > 0;
+        robots{i}.U = robots{i}.U & C(i,:);
+        
+        for j = 1:numel(robots{i}.U)
+            if ~robots{i}.U(j)
+                continue
+            end
+            
+            u = robots{j}.pos - robots{i}.pos;
+            w = robots{j}.goal - robots{i}.goal;
+            
+            if dot(u,w) < 0
+                g_i = robots{i}.goal;
+                g_j = robots{j}.goal;
+                
+                robots{i}.goal = g_j;
+                robots{i}.t_0 = t_c;
+                robots{i}.start = robots{i}.pos;
+
+                robots{j}.goal = g_i;
+                robots{j}.t_0 = t_c;
+                robots{j}.start = robots{j}.pos;
+                
+            end
+            
+        end
+        
     end
     
     % assign current C to previous C
     C_prev = C;
     
-    %drawnow
-    %pause(dt)
+    drawnow
+    pause(dt)
 end
+
