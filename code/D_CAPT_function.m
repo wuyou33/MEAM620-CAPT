@@ -1,9 +1,10 @@
-function num_swaps = D_CAPT_function(full_points,t,h,N,r_base,plot_flag)
+function [num_swaps,paths] = D_CAPT_function(full_points,t,h,N,r_base,plot_flag)
 
 S = full_points(1:N,:);
 G = full_points(N+1:end,:);
 
 robots = cell(N,1);
+paths = cell(N,1);
 
 num_swaps = 0;
 
@@ -77,6 +78,22 @@ for i_t = 1:length(t)
     for i = 1:N
         robots{i}.pos = update_pos(robots{i},t_c,t_f);
         X(i,:) = robots{i}.pos;
+        paths{i}(i_t,:) = robots{i}.pos;
+        
+        for j = (i+1):N
+            dist = sqrt(sum((robots{i}.pos - robots{j}.pos).^2));
+            if dist < 2*r_base
+                disp('COLLISION')
+                if plot_flag
+                    set(r_plots(i), 'cdata', [1,0,0], 'facealpha', 1, ...
+                        'linewidth', 3, 'edgecolor', 'r');
+                    set(r_plots(j), 'cdata', [1,0,0], 'facealpha', 1, ...
+                        'linewidth', 3, 'edgecolor', 'r');
+                end
+                return
+            end
+        end
+
     end
 
     if plot_flag
@@ -85,7 +102,6 @@ for i_t = 1:length(t)
             set(r_plots(i), 'xdata', r_c_x + robots{i}.pos(1), 'ydata', r_c_y + robots{i}.pos(2));
             set(h_plots(i), 'xdata', h_c_x + robots{i}.pos(1), 'ydata', h_c_y + robots{i}.pos(2));
 
-            paths{i}(i_t,:) = robots{i}.pos;
             set(p_plots(i), 'xdata', paths{i}(1:i_t,1), 'ydata', paths{i}(1:i_t,2));
             set(g_plots(i), 'xdata', [robots{i}.pos(1), robots{i}.goal(1)], ...
                 'ydata', [robots{i}.pos(2), robots{i}.goal(2)])
