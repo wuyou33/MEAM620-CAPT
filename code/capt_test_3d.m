@@ -5,9 +5,9 @@ addpath('munkres')
 
 dim = 3;
 
-N = 1;
-M = 5;
-r_base = .5;
+N = 5;
+M = 10;
+r_base = .15;
 
 R = [r_base, r_base, r_base];
 
@@ -53,7 +53,7 @@ tic
 
 iters = ceil(M/N);
 
-S_pass = repmat(S,1,1,iters);
+S_pass = repmat(S,[1,1,iters]);
 G_pass = zeros(N,3,iters);
 tf = zeros(1,iters);
 
@@ -106,6 +106,9 @@ W_pass(:,:,1) = S_pass(:,:,1);
 W_pass(:,:,2:iters+1) = G_pass;
 
 fprintf('Plotting... ')
-plot_3D_multi_wp(W_pass,tf,R)
+%plot_3D_multi_wp(W_pass,tf,R)
+W = W_pass;
+t = tf;
+runsim
 fprintf('Done! \n')
 
