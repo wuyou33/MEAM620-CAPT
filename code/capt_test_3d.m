@@ -7,8 +7,8 @@ save_vid = 1;
 
 dim = 3;
 
-N = 5;
-M = 10;
+N = 10;
+M = 20;
 r_base = .3;
 
 R = [r_base, r_base, r_base];
@@ -18,7 +18,7 @@ max_a = 2;
 t0 = 0;
 max_allow_dist = 2*r_base*sqrt(2);
 
-dist_scale = [max_allow_dist*(N+M), max_allow_dist*(N+M), .25*max_allow_dist*(N+M)];
+dist_scale = [max_allow_dist*sqrt(N+M), max_allow_dist*sqrt(N+M), .25*max_allow_dist*sqrt(N+M)];
 
 full_points = zeros(N+M,dim);
 full_points(1,:) = rand(1,dim).*dist_scale;
