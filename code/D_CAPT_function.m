@@ -1,4 +1,4 @@
-function [num_swaps,paths] = D_CAPT_function(full_points,t,h,N,r_base,plot_flag)
+function [num_swaps,paths] = D_CAPT_function(full_points,t,h,N,r_base,plot_flag,video_flag,video_name)
 
 S = full_points(1:N,:);
 G = full_points(N+1:end,:);
@@ -24,6 +24,13 @@ end
 
 C_prev = zeros(N);
 
+if video_flag
+    vid1 = VideoWriter(video_name);
+    vid1.FrameRate = 20;
+    vid1.Quality = 98;
+    open(vid1);
+end
+
 if plot_flag
     thetas = linspace(0,2*pi,20)';
     r_c_x = r_base * cos(thetas);
@@ -39,7 +46,12 @@ if plot_flag
     y_min = min(full_points(:,2))-pad;
     y_max = max(full_points(:,2))+pad;
 
-    f = figure(1);
+    if video_flag
+        f = figure('visible','off');
+    else
+        f = figure('visible','on');
+    end
+    
     clf
     r_plots = zeros(N,1);
     h_plots = zeros(N,1);
@@ -84,12 +96,16 @@ for i_t = 1:length(t)
             dist = sqrt(sum((robots{i}.pos - robots{j}.pos).^2));
             if dist < 2*r_base
                 disp('COLLISION')
+                u = robots{j}.pos - robots{i}.pos;
+                w = robots{j}.goal - robots{i}.goal;
+                dot(u,w)
                 if plot_flag
-                    set(r_plots(i), 'cdata', [1,0,0], 'facealpha', 1, ...
+                    set(r_plots(i), 'facecolor', [1,0,0], 'facealpha', 1, ...
                         'linewidth', 3, 'edgecolor', 'r');
-                    set(r_plots(j), 'cdata', [1,0,0], 'facealpha', 1, ...
+                    set(r_plots(j), 'facecolor', [1,0,0], 'facealpha', 1, ...
                         'linewidth', 3, 'edgecolor', 'r');
                 end
+                save('dcapt_crash.mat','S','G','t','h','N','r_base')
                 return
             end
         end
@@ -108,45 +124,46 @@ for i_t = 1:length(t)
         end
     end
     
+    if video_flag && ~mod(i_t,3)
+        print(f,'-dpng','telem_vid_frame1.png','-r0');
+        F1 = imread('telem_vid_frame1.png');
+        writeVideo(vid1, F1);
+    end
+    
     % calculate the new C matrix
     C = calculate_C(X,h);
-
+    U = C - C_prev;
+    
     % D-CAPT for each robot
-    for i = 1:N
-        robots{i}.U = (C(i,:) - C_prev(i,:)) > 0;
+    while any(U(:))
+        
+        [i,j] = find(U,1,'first');
 
-        while sum(robots{i}.U)
+        u = robots{j}.pos - robots{i}.pos;
+        w = robots{j}.goal - robots{i}.goal;
 
-            j = find(robots{i}.U,1,'first');
+        if dot(u,w) < 0
+            
+            num_swaps = num_swaps + 1;
+            
+            g_i = robots{i}.goal;
+            g_j = robots{j}.goal;
 
-            u = robots{j}.pos - robots{i}.pos;
-            w = robots{j}.goal - robots{i}.goal;
+            robots{i}.goal = g_j;
+            robots{i}.t_0 = t_c;
+            robots{i}.start = robots{i}.pos;
 
-            if dot(u,w) < 0
+            robots{j}.goal = g_i;
+            robots{j}.t_0 = t_c;
+            robots{j}.start = robots{j}.pos;
 
-                num_swaps = num_swaps + 1;
-
-                g_i = robots{i}.goal;
-                g_j = robots{j}.goal;
-
-                robots{i}.goal = g_j;
-                robots{i}.t_0 = t_c;
-                robots{i}.start = robots{i}.pos;
-
-                robots{j}.goal = g_i;
-                robots{j}.t_0 = t_c;
-                robots{j}.start = robots{j}.pos;
-
-                robots{i}.U = C(i,:);
-                robots{j}.U = C(j,:);
-
-            end
-
-            robots{i}.U(j) = false;
-            robots{j}.U(i) = false;
-
+            U(i,:) = C(i,:);
+            U(j,:) = C(j,:);
         end
 
+        U(i,j) = false;
+        U(j,i) = false;
+        
     end
 
     % assign current C to previous C
@@ -159,6 +176,12 @@ for i_t = 1:length(t)
 end
 
 if plot_flag
-    pause
+    if ~video_flag
+        pause
+    end
     delete(f)
+end
+
+if video_flag
+	close(vid1);
 end
