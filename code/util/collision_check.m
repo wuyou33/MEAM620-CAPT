@@ -3,7 +3,7 @@ collide = 0;
 if(size(p,1) <= 1)
     return;
 end
-p(:,3) = p(:,3)/3; % scale z-axis by 3 to make it ellipsoid
+p(:,3) = p(:,3)/4; % scale z-axis by 4 to make it ellipsoid
 dis = pdist(p);
 if min(dis) < 2*margin
     collide = 1;

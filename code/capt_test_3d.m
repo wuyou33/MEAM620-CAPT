@@ -1,13 +1,15 @@
 clear all
-%close all
+close all
 
 addpath('munkres')
+
+save_vid = 1;
 
 dim = 3;
 
 N = 5;
 M = 10;
-r_base = .15;
+r_base = .3;
 
 R = [r_base, r_base, r_base];
 
@@ -111,7 +113,16 @@ W = W_pass;
 t = tf;
 init_script;
 
+mins = min(squeeze(min(W)),[],2)' - R;
+maxs = max(squeeze(max(W)),[],2)' + R;
 
-trajectory = test_trajectory(num2cell(W(:,:,1),2), num2cell(W(:,:,end),2), true); % without visualization
+figure(1)
+clf
+plot3(0,0,0,'w')
+axis equal
+set(gca,'xlim',[mins(1),maxs(1)],'ylim',[mins(2),maxs(2)],'zlim',[mins(3),maxs(3)])
+set(gcf,'position',[10,50,1000,800])
+
+test_trajectory; % without visualization
 fprintf('Done! \n')
 

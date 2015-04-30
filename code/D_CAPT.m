@@ -152,40 +152,34 @@ for i_t = 1:length(t)
     
     % calculate the new C matrix
     C = calculate_C(X,h);
+    U = C - C_prev;
     
     % D-CAPT for each robot
-    for i = 1:N
-        robots{i}.U = (C(i,:) - C_prev(i,:)) > 0;
-        %robots{i}.U = robots{i}.U & C(i,:);
+    while any(U(:))
         
-        while sum(robots{i}.U)
-            
-            j = find(robots{i}.U,1,'first');
-            
-            u = robots{j}.pos - robots{i}.pos;
-            w = robots{j}.goal - robots{i}.goal;
-            
-            if dot(u,w) < 0
-                g_i = robots{i}.goal;
-                g_j = robots{j}.goal;
-                
-                robots{i}.goal = g_j;
-                robots{i}.t_0 = t_c;
-                robots{i}.start = robots{i}.pos;
+        [i,j] = find(U,1,'first');
 
-                robots{j}.goal = g_i;
-                robots{j}.t_0 = t_c;
-                robots{j}.start = robots{j}.pos;
-                
-                robots{i}.U = C(i,:);
-                robots{j}.U = C(j,:);
-                
-            end
-            
-            robots{i}.U(j) = false;
-            robots{j}.U(i) = false;
-            
+        u = robots{j}.pos - robots{i}.pos;
+        w = robots{j}.goal - robots{i}.goal;
+
+        if dot(u,w) < 0
+            g_i = robots{i}.goal;
+            g_j = robots{j}.goal;
+
+            robots{i}.goal = g_j;
+            robots{i}.t_0 = t_c;
+            robots{i}.start = robots{i}.pos;
+
+            robots{j}.goal = g_i;
+            robots{j}.t_0 = t_c;
+            robots{j}.start = robots{j}.pos;
+
+            U(i,:) = C(i,:);
+            U(j,:) = C(j,:);
         end
+
+        U(i,j) = false;
+        U(j,i) = false;
         
     end
     
