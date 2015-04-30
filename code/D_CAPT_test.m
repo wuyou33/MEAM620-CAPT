@@ -13,9 +13,12 @@ t = linspace(t_0,t_f,(t_f-t_0)/dt);
 
 plot_flag = 0;
 swap_test_flag = 0;
-optim_test_flag = 1;
+optim_test_flag = 0;
+billiards_test_flag = 0;
+h_inf_test_flag = 1;
+d_capt_normal_test_flag = 0;
 
-num_tests = 10;
+num_tests = 100;
 
 hs = [1:100]*2*sqrt(2)*r_base;
 swap_matrix = zeros(num_tests,numel(hs));
@@ -31,7 +34,7 @@ if swap_test_flag
             fprintf('Trial %d of %d, h %d of %d... ',TRIAL_NUM,num_tests,H,numel(hs))
 
             full_points = seed_random(N,r_base,dim);
-            [num_swaps,paths] = D_CAPT_function(full_points,t,h,N,r_base,plot_flag);
+            [num_swaps,paths] = D_CAPT_function(full_points,t,h,N,r_base,plot_flag,0,'');
             
             fprintf('Done! \n')
             swap_matrix(TRIAL_NUM,H) = num_swaps;
@@ -41,7 +44,7 @@ if swap_test_flag
     save('dcapt_swap_data.mat','swap_matrix','num_tests','hs','N','r_base')
 end
 
-Ns = [1:5:11];
+Ns = [11];
 h = 2*2*r_base*sqrt(2);
 dcapt_matrix = zeros(num_tests,numel(Ns));
 ccapt_matrix = zeros(num_tests,numel(Ns));
@@ -56,7 +59,7 @@ if optim_test_flag
             fprintf('Trial %d of %d, N %d of %d... ',TRIAL_NUM,num_tests,num_bots,numel(Ns))
 
             full_points = seed_random(N,r_base,dim);
-            [num_swaps,paths] = D_CAPT_function(full_points,t,h,N,r_base,plot_flag);
+            [num_swaps,paths] = D_CAPT_function(full_points,t,h,N,r_base,plot_flag,0,'');
 
             total_dcapt_dist = 0;
 
@@ -74,4 +77,32 @@ if optim_test_flag
     end
     save('dcapt_ccapt_data.mat','dcapt_matrix','ccapt_matrix','Ns','num_tests')
 
+end
+
+N = 25;
+h = 2*2*r_base*sqrt(2);
+
+if billiards_test_flag
+    fprintf('Billiards test... ')
+    [S,G] = generate_billiards(r_base,N,dim);
+    [~,~] = D_CAPT_function([S;G],t,h,N,r_base,1,1,'D_CAPT_billiards.avi');
+    fprintf('Done! \n')
+end
+
+N = 20;
+h = 100*2*r_base*sqrt(2);
+if h_inf_test_flag
+    fprintf('H_inf test... ')
+    full_points = seed_random(N,r_base,dim);
+    [~,~] = D_CAPT_function(full_points,t,h,N,r_base,1,1,'D_CAPT_h_inf_test.avi');
+    fprintf('Done! \n')
+end
+
+N = 20;
+h = 2*2*r_base*sqrt(2);
+if d_capt_normal_test_flag
+    fprintf('Normal test... ')
+    full_points = seed_random(N,r_base,dim);
+    [~,~] = D_CAPT_function(full_points,t,h,N,r_base,1,1,'D_CAPT_normal_test.avi');
+    fprintf('Done! \n')
 end
